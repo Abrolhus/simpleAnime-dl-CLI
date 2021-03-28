@@ -9,6 +9,7 @@ import logging
 import subprocess
 
 from anime_downloader.sites import get_anime_class
+import util
 
 
 @click.command()
@@ -27,6 +28,7 @@ def hello(name, ep, provider, autoplay):
     episode = anime[ep-1]
     episode2 = anime[ep]
     click.echo(episode.source().stream_url)
+    #click.echo(episode2.source().stream_url)
     click.echo(episode.source().referer)
     # util.play_episode(episode, player=player, title=f'{anime.title} - Episode {episode.ep_no}')
     # title=f'{anime.title} - Episode {episode.ep_no}'
@@ -41,13 +43,11 @@ def hello(name, ep, provider, autoplay):
             # '--referrer="{}"'.format(episode2.source().referer),
             # episode2.source().stream_url
         # ])
-        mpvArgs = [player]
+        mpvArgs = [player, '--referrer={}'.format('https://twist.moe/')]
         for epi in anime:
             title = f'{anime.title} - Episode {epi.ep_no}'
-            mpvArgs += ['--title={}'.format(title),
-            '--referrer="{}"'.format(epi.source().referer),
-            epi.source().stream_url]
-            click.echo("uai");
+            mpvArgs += ['--title={}'.format(title), 'ffmpeg://{}'.format(epi.source().stream_url)]
+            click.echo("uai")
         p = subprocess.Popen(mpvArgs)
     else:
         p = subprocess.Popen([player, episode.source().stream_url
