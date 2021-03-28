@@ -7,6 +7,7 @@ import requests_cache
 import requests
 import logging
 import subprocess
+import tempfile
 
 from anime_downloader.sites import get_anime_class
 import util
@@ -33,7 +34,6 @@ def hello(name, ep, provider, autoplay):
     # util.play_episode(episode, player=player, title=f'{anime.title} - Episode {episode.ep_no}')
     # title=f'{anime.title} - Episode {episode.ep_no}'
     # title2=f'{anime.title} - Episode {episode2.ep_no}'
-    if player == 'mpv':
         # p = subprocess.Popen([
             # player,
             # '--title={}'.format(title),
@@ -43,16 +43,33 @@ def hello(name, ep, provider, autoplay):
             # '--referrer="{}"'.format(episode2.source().referer),
             # episode2.source().stream_url
         # ])
-        mpvArgs = [player, '--referrer={}'.format('https://twist.moe/')]
-        for epi in anime:
-            title = f'{anime.title} - Episode {epi.ep_no}'
-            mpvArgs += ['--title={}'.format(title), 'ffmpeg://{}'.format(epi.source().stream_url)]
-            click.echo("uai")
+    tfile = tempfile.NamedTemporaryFile(mode='a+', suffix='.m3u8')
+    mpvArgs = [player, '--referrer={}'.format('https://twist.moe/'), '--playlist']
+    if player == 'mpv':
+        util.makePlaylist(anime[0:1], tfile)
+        # for epi in anime:
+        # title = f'{anime.title} - Episode {epi.ep_no}'
+        # mpvArgs += ['--title={}'.format(title),
+        # 'ffmpeg://{}'.format(epi.source().stream_url)]
+        # click.echo("uai")
+        print(tfile.name)
+        mpvArgs.append(tfile.name)
+        print(mpvArgs)
+        tfile.seek(0)
+        print(tfile.read())
+        #mpvArgs.append('{0} >/dev/null 2>&1 &')
+        #subprocess.Popen("nohup usr/local/bin/otherscript.pl {0} >/dev/null 2>&1 &", shell=True)
+        print(''.join(mpvArgs))
         p = subprocess.Popen(mpvArgs)
+        p.wait()
+        util.addAnimesToPlaylist(anime[1:], tfile)
+        print("humm")
+        print(anime[0:1])
+        print(anime[1:])
+        print("uaaaaaaaaaaaaaaaaaaaaaaaa");
     else:
-        p = subprocess.Popen([player, episode.source().stream_url
-                              ])
-    p.wait()
+        p = subprocess.Popen([player, episode.source().stream_url])
+        p.wait()
 
 if __name__ == "__main__":
     hello()
