@@ -60,13 +60,15 @@ def hello(name, ep, provider, autoplay):
         #mpvArgs.append('{0} >/dev/null 2>&1 &')
         #subprocess.Popen("nohup usr/local/bin/otherscript.pl {0} >/dev/null 2>&1 &", shell=True)
         print(''.join(mpvArgs))
-        p = subprocess.Popen(mpvArgs)
-        p.wait()
         util.addAnimesToPlaylist(anime[1:], tfile)
+        p = subprocess.Popen(mpvArgs, stdin=None, stdout=None, stderr=None)
         print("humm")
         print(anime[0:1])
         print(anime[1:])
         print("uaaaaaaaaaaaaaaaaaaaaaaaa");
+        tfile.seek(0)
+        print(tfile.read())
+        p.wait()
     else:
         p = subprocess.Popen([player, episode.source().stream_url])
         p.wait()
